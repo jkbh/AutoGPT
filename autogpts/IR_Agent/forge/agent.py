@@ -1,3 +1,5 @@
+import json
+from pprint import pprint
 from forge.sdk import (
     Agent,
     AgentDB,
@@ -7,6 +9,8 @@ from forge.sdk import (
     Task,
     TaskRequestBody,
     Workspace,
+    PromptEngine,
+    chat_completion_request,
 )
 from forge.actions import ActionRegister
 
@@ -120,28 +124,73 @@ class ForgeAgent(Agent):
         multiple steps. Returning a request to continue in the step output, the user can then decide
         if they want the agent to continue or not.
         """
-        # An example that
+
+        task = await self.db.get_task(task_id)
+
         step = await self.db.create_step(
-            task_id=task_id, input=step_request, is_last=True
+            task_id=task_id, input=step_request, is_last=False
         )
 
-        self.workspace.write(task_id=task_id, path="output.txt", data=b"Washington D.C")
+        prompt_engine = PromptEngine("gpt-3.5-turbo")
+        system_prompt = prompt_engine.load_prompt("system-format")
+        messages = [{"role": "system", "content": system_prompt}]
 
-        await self.db.create_artifact(
-            task_id=task_id,
-            step_id=step.step_id,
-            file_name="output.txt",
-            relative_path="",
-            agent_created=True,
+        resources = ""
+        if self.workspace.exists("shared", "resources.txt"):
+            resources = str(self.workspace.read("shared", "resources.txt"))
+
+        task_prompt = prompt_engine.load_prompt(
+            "task-step",
+            task=task.input,
+            abilities=self.abilities.list_abilities_for_prompt(),
+            resources=resources,
         )
 
-        step.output = "Washington D.C"
+        messages.append({"role": "user", "content": task_prompt})
 
-        LOG.info(
-            f"\t✅ Final Step completed: {step.step_id}. \n"
-            + f"Output should be placeholder text Washington D.C. You'll need to \n"
-            + f"modify execute_step to include LLM behavior. Follow the tutorial "
-            + f"if confused. "
+        LOG.info(f"Messages: {messages}")
+
+        try:
+            chat_response = await chat_completion_request(
+                messages=messages, model="gpt-3.5-turbo"
+            )
+
+            response_content = chat_response["choices"][0].message.content
+            answer = json.loads(response_content)
+
+        except json.JSONDecodeError as e:
+            LOG.error(f"Unable to decode chat response: {response_content}")
+        except Exception as e:
+            LOG.error(f"Exception: {e}")
+
+        plan = answer["thoughts"]["plan"].split("\n")
+        plan = [task.strip("- ") for task in plan]
+
+        LOG.info(f"Answer: {answer}")
+        ability = answer["ability"]
+
+        output = await self.abilities.run_action(
+            task_id, ability["name"], **ability["args"]
         )
+
+        LOG.info(f"Ability output: {output}")
+
+        step.output = f'{answer["thoughts"]["speak"]}'
+        step.additional_output = {
+            "ability": ability,
+            "ability_output": output,
+        }
+
+        # self.workspace.write(
+        #     task_id=task_id, path="step_output.txt", data=output.encode()
+        # )
+
+        # await self.db.create_artifact(
+        #     task_id=task_id,
+        #     step_id=step.step_id,
+        #     file_name="step_output.txt",
+        #     relative_path="",
+        #     agent_created=True,
+        # )
 
         return step

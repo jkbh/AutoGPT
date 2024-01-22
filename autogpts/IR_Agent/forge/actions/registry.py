@@ -179,6 +179,7 @@ class ActionRegister:
         """
         try:
             action = self.abilities[action_name]
+            task_id = "shared"
             return await action(self.agent, task_id, *args, **kwds)
         except Exception:
             raise

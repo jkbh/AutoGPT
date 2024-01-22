@@ -6,6 +6,7 @@ from tenacity import retry, stop_after_attempt, wait_random_exponential
 from .sdk.forge_log import ForgeLogger
 from litellm import completion, acompletion, AuthenticationError, InvalidRequestError
 
+
 LOG = ForgeLogger(__name__)
 
 
@@ -15,10 +16,17 @@ async def chat_completion_request(
 ) -> typing.Union[typing.Dict[str, typing.Any], Exception]:
     """Generate a response to a list of messages using OpenAI's API"""
     try:
+        # kwargs["model"] = f"openai/{model}"
         kwargs["model"] = model
         kwargs["messages"] = messages
 
         resp = await acompletion(**kwargs)
+
+        # For usage with local model
+        # resp = openai.ChatCompletion.create(
+        #     messages=messages, model="mistral-7b-instruct-v0.2.Q5_K_S.gguf"
+        # )
+
         return resp
     except AuthenticationError as e:
         LOG.exception("Authentication Error")

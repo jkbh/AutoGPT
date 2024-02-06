@@ -1,3 +1,5 @@
+import fitz
+from pathlib import Path
 from typing import List
 
 from ..registry import action
@@ -5,7 +7,7 @@ from ..registry import action
 
 @action(
     name="list_files",
-    description="List files in a directory",
+    description="List files in a directory. If the there is specific path request use '/' as the path.",
     parameters=[
         {
             "name": "path",

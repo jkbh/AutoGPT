@@ -1,5 +1,5 @@
 import json
-from pprint import pprint
+from pprint import pprint, pformat
 from forge.sdk import (
     Agent,
     AgentDB,
@@ -13,6 +13,8 @@ from forge.sdk import (
     chat_completion_request,
 )
 from forge.actions import ActionRegister
+from forge.sdk.errors import NotFoundError
+from forge.sdk.model import Artifact
 
 
 LOG = ForgeLogger(__name__)
@@ -127,35 +129,57 @@ class ForgeAgent(Agent):
 
         task = await self.db.get_task(task_id)
 
-        step = await self.db.create_step(
-            task_id=task_id, input=step_request, is_last=False
-        )
-
         prompt_engine = PromptEngine("gpt-3.5-turbo")
+
+        # Get chat history
+        # try:
+        # messages = await self.db.get_chat_history(task_id)
+        # except NotFoundError:
+        # LOG.info("No chat history found, creating system format")
+        # system_prompt = prompt_engine.load_prompt("system-format")
+        # messages = [{"role": "system", "content": system_prompt}]
+        # await self.db.add_chat_message(task_id, "system", system_prompt)
+
         system_prompt = prompt_engine.load_prompt("system-format")
         messages = [{"role": "system", "content": system_prompt}]
 
-        resources = ""
-        if self.workspace.exists("shared", "resources.txt"):
-            resources = str(self.workspace.read("shared", "resources.txt"))
+        try:
+            actions = await self.db.get_action_history(task_id)
+        except NotFoundError:
+            actions = []
+
+        # Get outputs from previous step actions and add as resources
+        try:
+            past_steps, _ = await self.db.list_steps(task_id)
+        except NotFoundError:
+            past_steps = []
+        action_outputs = [
+            step.additional_output["ability_output"] for step in past_steps
+        ]
+        action_history = [
+            f"Action {i}: {action}\nOutput {i}:\n{result}"
+            for i, (action, result) in enumerate(zip(actions, action_outputs), 1)
+        ]
 
         task_prompt = prompt_engine.load_prompt(
             "task-step",
             task=task.input,
             abilities=self.abilities.list_abilities_for_prompt(),
-            resources=resources,
+            previous_actions=action_history,
+            # resources=resources,
         )
 
         messages.append({"role": "user", "content": task_prompt})
-
-        LOG.info(f"Messages: {messages}")
+        # await self.db.add_chat_message(task_id, "user", task_prompt)
+        LOG.info(f"Task prompt: {pformat(task_prompt)}")
 
         try:
             chat_response = await chat_completion_request(
                 messages=messages, model="gpt-3.5-turbo"
             )
 
-            response_content = chat_response["choices"][0].message.content
+            response_content = chat_response.choices[0].message.content
+            # await self.db.add_chat_message(task_id, "assistant", response_content)
             answer = json.loads(response_content)
 
         except json.JSONDecodeError as e:
@@ -163,23 +187,43 @@ class ForgeAgent(Agent):
         except Exception as e:
             LOG.error(f"Exception: {e}")
 
-        plan = answer["thoughts"]["plan"].split("\n")
-        plan = [task.strip("- ") for task in plan]
+        ## Parse LLM plan
+        # plan = answer["thoughts"]["plan"].split("\n")
+        # plan = [task.strip("- ") for task in plan]
 
-        LOG.info(f"Answer: {answer}")
+        LOG.info(f"Answer: {pformat(answer)}")
+        thoughts = answer["thoughts"]
         ability = answer["ability"]
 
-        output = await self.abilities.run_action(
+        ## Create step in DB
+        step = await self.db.create_step(
+            task_id,
+            input=step_request,
+            is_last=ability["name"] == "finish",
+        )
+
+        ## Execute ability
+        ability_output = await self.abilities.run_action(
             task_id, ability["name"], **ability["args"]
         )
 
-        LOG.info(f"Ability output: {output}")
+        await self.db.create_action(task_id, ability["name"], ability["args"])
+        # Update step
 
-        step.output = f'{answer["thoughts"]["speak"]}'
-        step.additional_output = {
+        output = f'{thoughts["speak"]}'
+
+        additional_output = {
             "ability": ability,
-            "ability_output": output,
+            "ability_output": ability_output,
         }
+
+        step = await self.db.update_step(
+            task_id,
+            step.step_id,
+            output=output,
+            additional_output=additional_output,
+            status="completed",
+        )
 
         # self.workspace.write(
         #     task_id=task_id, path="step_output.txt", data=output.encode()

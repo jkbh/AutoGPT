@@ -1,6 +1,7 @@
 import abc
 import os
 import typing
+import fitz
 from pathlib import Path
 from google.cloud import storage
 
@@ -53,6 +54,18 @@ class LocalWorkspace(Workspace):
     def read(self, task_id: str, path: str) -> bytes:
         with open(self._resolve_path(task_id, path), "rb") as f:
             return f.read()
+
+    def read_text(self, task_id: str, path: str) -> str:
+        file_path = self._resolve_path(task_id, path)
+        match file_path.suffix:
+            case ".pdf":
+                with fitz.open(file_path) as doc:
+                    return chr(12).join([page.get_text() for page in doc])
+            case ".txt":
+                with open(file_path, "rb") as file:
+                    return file.read().decode()
+            case _:
+                raise ValueError(f"Unsupported file type: {file_path.suffix}")
 
     def write(self, task_id: str, path: str, data: bytes) -> None:
         file_path = self._resolve_path(task_id, path)

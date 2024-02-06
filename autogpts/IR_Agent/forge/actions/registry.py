@@ -108,7 +108,7 @@ class ActionRegister:
         for action_path in glob.glob(
             os.path.join(os.path.dirname(__file__), "**/*.py"), recursive=True
         ):
-            if not os.path.basename(action_path) in [
+            if os.path.basename(action_path) not in [
                 "__init__.py",
                 "registry.py",
             ]:
@@ -179,7 +179,6 @@ class ActionRegister:
         """
         try:
             action = self.abilities[action_name]
-            task_id = "shared"
             return await action(self.agent, task_id, *args, **kwds)
         except Exception:
             raise

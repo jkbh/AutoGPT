@@ -1,0 +1,32 @@
+{
+    "category": [
+        "information_retrieval",
+        "general"
+    ],
+    "cutoff": 60,
+    "dependencies": [
+        "TestReadFile"
+    ],
+    "eval_id": "d59ec964-6f67-4b3d-a4de-c4436fc76f95",
+    "ground": {
+        "answer": "I ingested the content into my memory",
+        "eval": {
+            "type": "python"
+        },
+        "files": [
+            "output.csv"
+        ],
+        "should_contain": [
+            "id,name,timestamp\n1,Bob,2023-09-24 12:05:00\n2,Charlie,2023-09-24 12:10:00\n3,Alice,2023-09-25 14:10:00\n4,David,2023-09-26 16:20:00"
+        ]
+    },
+    "info": {
+        "description": "Tests if the agent ingest a txt file into his memory",
+        "difficulty": "basic",
+        "side_effects": [
+            ""
+        ]
+    },
+    "name": "TestIngest",
+    "task": "Ingest the content of document.txt into your memory"
+}

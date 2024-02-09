@@ -1,21 +1,20 @@
 import json
-from pprint import pprint, pformat
+from pprint import pformat
+
+from forge.actions import ActionRegister
 from forge.sdk import (
     Agent,
     AgentDB,
     ForgeLogger,
+    PromptEngine,
     Step,
     StepRequestBody,
     Task,
     TaskRequestBody,
     Workspace,
-    PromptEngine,
     chat_completion_request,
 )
-from forge.actions import ActionRegister
 from forge.sdk.errors import NotFoundError
-from forge.sdk.model import Artifact
-
 
 LOG = ForgeLogger(__name__)
 
@@ -131,6 +130,7 @@ class ForgeAgent(Agent):
 
         prompt_engine = PromptEngine("gpt-3.5-turbo")
 
+        # Uncomment to use full chat history in the openai messages format
         # Get chat history
         # try:
         # messages = await self.db.get_chat_history(task_id)
@@ -148,25 +148,41 @@ class ForgeAgent(Agent):
         except NotFoundError:
             actions = []
 
-        # Get outputs from previous step actions and add as resources
         try:
             past_steps, _ = await self.db.list_steps(task_id)
         except NotFoundError:
             past_steps = []
-        action_outputs = [
-            step.additional_output["ability_output"] for step in past_steps
-        ]
-        action_history = [
-            f"Action {i}: {action}\nOutput {i}:\n{result}"
-            for i, (action, result) in enumerate(zip(actions, action_outputs), 1)
-        ]
+
+        # actions_outputs = [
+        #     (action, step.additional_output["ability_output"])
+        #     for action, step in zip(actions, past_steps)
+        #     if step.additional_output
+        # ]
+
+        # actions_outputs_fmt = [
+        #     f"Action {i}: {action}\nOutput {i}:\n{result}"
+        #     for i, (action, result) in enumerate(actions_outputs)
+        # ]
+
+        previous_actions = []
+        for i, step in enumerate(past_steps, 1):
+            if step.additional_output:
+                error = step.additional_output["ability"].get("error", None)
+                output = step.additional_output["ability"].get("output", None)
+                if error:
+                    previous_actions.append(
+                        f"{i}. Action: {step.input}\nError: {error}"
+                    )
+                elif output:
+                    previous_actions.append(
+                        f"{i}. Action: {step.input}\nOutput: {output}"
+                    )
 
         task_prompt = prompt_engine.load_prompt(
             "task-step",
             task=task.input,
             abilities=self.abilities.list_abilities_for_prompt(),
-            previous_actions=action_history,
-            # resources=resources,
+            previous_actions=previous_actions,
         )
 
         messages.append({"role": "user", "content": task_prompt})
@@ -182,7 +198,7 @@ class ForgeAgent(Agent):
             # await self.db.add_chat_message(task_id, "assistant", response_content)
             answer = json.loads(response_content)
 
-        except json.JSONDecodeError as e:
+        except json.JSONDecodeError:
             LOG.error(f"Unable to decode chat response: {response_content}")
         except Exception as e:
             LOG.error(f"Exception: {e}")
@@ -202,20 +218,25 @@ class ForgeAgent(Agent):
             is_last=ability["name"] == "finish",
         )
 
+        additional_output = {
+            "ability": {
+                "proposed": ability,
+            }
+        }
+
         ## Execute ability
-        ability_output = await self.abilities.run_action(
-            task_id, ability["name"], **ability["args"]
-        )
+        try:
+            ability_output = await self.abilities.run_action(
+                task_id=task_id, action_name=ability["name"], **ability["args"]
+            )
+            additional_output["ability"]["output"] = str(ability_output)
+        except Exception as e:
+            LOG.error(f"Error trying to execute ability {ability}: {e}")
+            additional_output["ability"]["error"] = str(e)
 
         await self.db.create_action(task_id, ability["name"], ability["args"])
-        # Update step
 
         output = f'{thoughts["speak"]}'
-
-        additional_output = {
-            "ability": ability,
-            "ability_output": ability_output,
-        }
 
         step = await self.db.update_step(
             task_id,

@@ -35,50 +35,49 @@ async def ingest_document(
     db = ChromaVectorStore("./chroma")
     documents = [node.text for node in nodes]
     print(len(documents))
-    metadatas = [{"task_id": task_id, "parent_file": file_path} for i in range(100)]
+    metadatas = [{"task_id": task_id, "parent_file": file_path} for _ in range(100)]
     db.add(documents[:100], metadatas[:100])
 
 
 @action(
-    name="query_vectorstore",
-    description="Query the vector database with a prompt to find documents similar to the prompt. Use this action to access your memory if need information",
+    name="query_memory",
+    description="Retrieve the most relevant information from your memory for a query and save it to a .txt file",
     parameters=[
         {
             "name": "query",
-            "description": "Query to search for in the vector database",
+            "description": "Query used for retrieval of infomration",
             "type": "string",
             "required": True,
         },
         {
-            "name": "result_file",
-            "description": "File to save the results to",
+            "name": "output_file",
+            "description": "Textfile to save the output to",
             "type": "string",
             "required": True,
         },
     ],
     output_type="string",
 )
-async def query_vectorstore(
+async def query_memory(
     agent,
     task_id: str,
     query: str,
-    result_file: str,
+    output_file: str,
 ) -> str:
     """
     Query the vector database
     """
     db = ChromaVectorStore("./chroma")
-    result = db.query([query], None)
+    result = db.query([query])
     # format result to save to txt file
     data = f"Query results for '{query}':\n\n"
     data += "\n\n".join(
         [f"Document {i}:\n\n{doc}" for i, doc in enumerate(result["documents"][0], 1)]
     )
-    agent.workspace.write(task_id=task_id, path=result_file, data=data.encode())
-    await agent.db.create_artifact(
+    agent.workspace.write(task_id=task_id, path=output_file, data=data.encode())
+    return await agent.db.create_artifact(
         task_id=task_id,
-        file_name=result_file.split("/")[-1],
-        relative_path=result_file,
+        file_name=output_file.split("/")[-1],
+        relative_path=output_file,
         agent_created=True,
     )
-    return data

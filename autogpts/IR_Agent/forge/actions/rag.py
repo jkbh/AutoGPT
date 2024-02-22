@@ -29,7 +29,7 @@ async def generate_with_context(agent, task_id: str, prompt: str, context_file: 
 
     engine = PromptEngine(model)
     rag_prompt = engine.load_prompt(
-        "augmented-generation.j2", task=prompt, context=context
+        "augmented-generation", task=prompt, context=context
     )
 
     messages = [

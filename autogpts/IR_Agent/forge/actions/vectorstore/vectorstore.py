@@ -6,37 +6,37 @@ from llama_index import Document
 import os
 
 
-@action(
-    name="ingest_document",
-    description="Ingest a document into the vector database. Use this action if you need to store large files with information in your memory for later access",
-    parameters=[
-        {
-            "name": "file_path",
-            "description": "Path to the file to ingest",
-            "type": "string",
-            "required": True,
-        }
-    ],
-    output_type="None",
-)
-async def ingest_document(
-    agent,
-    task_id: str,
-    file_path: str,
-):
-    """
-    Add a document to the vector databse
-    """
-    fulltext = agent.workspace.read_text("shared", file_path)
+# @action(
+#     name="ingest_document",
+#     description="Ingest a document into the vector database. Use this action if you need to store large files with information in your memory for later access",
+#     parameters=[
+#         {
+#             "name": "file_path",
+#             "description": "Path to the file to ingest",
+#             "type": "string",
+#             "required": True,
+#         }
+#     ],
+#     output_type="None",
+# )
+# async def ingest_document(
+#     agent,
+#     task_id: str,
+#     file_path: str,
+# ):
+#     """
+#     Add a document to the vector databse
+#     """
+#     fulltext = agent.workspace.read_text("shared", file_path)
 
-    splitter = SentenceSplitter(separator=".", chunk_size=128, chunk_overlap=20)
-    nodes = splitter.get_nodes_from_documents([Document(text=fulltext)])
+#     splitter = SentenceSplitter(separator=".", chunk_size=128, chunk_overlap=20)
+#     nodes = splitter.get_nodes_from_documents([Document(text=fulltext)])
 
-    db = ChromaVectorStore("./chroma")
-    documents = [node.text for node in nodes]
-    print(len(documents))
-    metadatas = [{"task_id": task_id, "parent_file": file_path} for _ in range(100)]
-    db.add(documents[:100], metadatas[:100])
+#     db = ChromaVectorStore("./chroma")
+#     documents = [node.text for node in nodes]
+#     print(len(documents))
+#     metadatas = [{"task_id": task_id, "parent_file": file_path} for _ in range(100)]
+#     db.add(documents[:100], metadatas[:100])
 
 
 @action(
@@ -45,7 +45,7 @@ async def ingest_document(
     parameters=[
         {
             "name": "query",
-            "description": "Query used for retrieval of infomration",
+            "description": "The query used for retrieval",
             "type": "string",
             "required": True,
         },

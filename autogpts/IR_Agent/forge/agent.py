@@ -28,6 +28,7 @@ RESOURCES = [
     "A vector database representing your memory. You can ingest documents into it and query it for relevant information."
 ]
 
+
 class ForgeAgent(Agent):
     """
     The goal of the Forge is to take care of the boilerplate code, so you can focus on
@@ -137,88 +138,29 @@ class ForgeAgent(Agent):
 
         task = await self.db.get_task(task_id)
 
-        prompt_engine = PromptEngine("gpt-3.5-turbo")
+        step_prompt_input = step_request.input if step_request.input else task.input
 
-        # Uncomment to use full chat history in the openai messages format
-        # Get chat history
-        # try:
-        # messages = await self.db.get_chat_history(task_id)
-        # except NotFoundError:
-        # LOG.info("No chat history found, creating system format")
-        # system_prompt = prompt_engine.load_prompt("system-format")
-        # messages = [{"role": "system", "content": system_prompt}]
-        # await self.db.add_chat_message(task_id, "system", system_prompt)
+        previous_actions = await self.construct_step_history(task_id)
+
+        prompt_engine = PromptEngine("gpt-3.5-turbo")
 
         system_prompt = prompt_engine.load_prompt("system-format")
         messages = [{"role": "system", "content": system_prompt}]
 
-        try:
-            actions = await self.db.get_action_history(task_id)
-        except NotFoundError:
-            actions = []
-
-        try:
-            past_steps, _ = await self.db.list_steps(task_id)
-        except NotFoundError:
-            past_steps = []
-
-        # actions_outputs = [
-        #     (action, step.additional_output["ability_output"])
-        #     for action, step in zip(actions, past_steps)
-        #     if step.additional_output
-        # ]
-
-        # actions_outputs_fmt = [
-        #     f"Action {i}: {action}\nOutput {i}:\n{result}"
-        #     for i, (action, result) in enumerate(actions_outputs)
-        # ]
-
-        previous_actions = []
-        for i, step in enumerate(past_steps, 1):
-            if step.additional_output:
-                error = step.additional_output["ability"].get("error", None)
-                output = step.additional_output["ability"].get("output", None)
-                if error:
-                    previous_actions.append(
-                        f"{i}. Action: {step.input}\nError: {error}"
-                    )
-                elif output:
-                    previous_actions.append(
-                        f"{i}. Action: {step.input}\nOutput: {output}"
-                    )
-
         task_prompt = prompt_engine.load_prompt(
             "task-step",
-            task=task.input,
+            task=step_prompt_input,
             abilities=self.abilities.list_abilities_for_prompt(),
             best_practices=BEST_PRACTICES,
             resources=RESOURCES,
             previous_actions=previous_actions,
         )
-
         messages.append({"role": "user", "content": task_prompt})
-        # await self.db.add_chat_message(task_id, "user", task_prompt)
-        LOG.info(f"Task prompt: {pformat(task_prompt)}")
 
-        try:
-            chat_response = await chat_completion_request(
-                messages=messages, model="gpt-3.5-turbo"
-            )
-
-            response_content = chat_response.choices[0].message.content
-            # await self.db.add_chat_message(task_id, "assistant", response_content)
-            answer = json.loads(response_content)
-
-        except json.JSONDecodeError:
-            LOG.error(f"Unable to decode chat response: {response_content}")
-        except Exception as e:
-            LOG.error(f"Exception: {e}")
-
-        ## Parse LLM plan
-        # plan = answer["thoughts"]["plan"].split("\n")
-        # plan = [task.strip("- ") for task in plan]
-
+        LOG.info(f"Messages: {pformat(messages)}")
+        answer = await self.make_step_llm_call(messages)
         LOG.info(f"Answer: {pformat(answer)}")
+
         thoughts = answer["thoughts"]
         ability = answer["ability"]
 
@@ -226,47 +168,83 @@ class ForgeAgent(Agent):
         step = await self.db.create_step(
             task_id,
             input=step_request,
-            is_last=ability["name"] == "finish",
+            is_last=(ability["name"] == "finish"),
         )
 
+        ## Execute ability and handle errors
+        output = await self.execute_ability(task_id, ability)
+
         additional_output = {
+            "thoughts": thoughts,
             "ability": {
                 "proposed": ability,
+                "output": output,
             }
         }
 
-        ## Execute ability
-        try:
-            ability_output = await self.abilities.run_action(
-                task_id=task_id, action_name=ability["name"], **ability["args"]
-            )
-            additional_output["ability"]["output"] = str(ability_output)
-        except Exception as e:
-            LOG.error(f"Error trying to execute ability {ability}: {e}")
-            additional_output["ability"]["error"] = str(e)
-
         await self.db.create_action(task_id, ability["name"], ability["args"])
-
-        output = f'{thoughts["speak"]}'
-
         step = await self.db.update_step(
             task_id,
             step.step_id,
-            output=output,
+            output=thoughts["speak"],
             additional_output=additional_output,
             status="completed",
         )
 
-        # self.workspace.write(
-        #     task_id=task_id, path="step_output.txt", data=output.encode()
-        # )
-
-        # await self.db.create_artifact(
-        #     task_id=task_id,
-        #     step_id=step.step_id,
-        #     file_name="step_output.txt",
-        #     relative_path="",
-        #     agent_created=True,
-        # )
-
         return step
+
+    async def execute_ability(self, task_id, ability):
+        """Executes an ability"""
+
+        try:
+            ability_output = await self.abilities.run_action(
+                task_id=task_id, action_name=ability["name"], **ability["args"]
+            )
+            output = str(ability_output)
+        except Exception as e:
+            LOG.error(f"Error trying to execute ability {ability}: {e}")
+            output = f"ERROR: {str(e)}"
+
+        return output
+
+    async def make_step_llm_call(self, messages) -> dict:
+        """Calls language model an decodes system format answer into python dict"""
+
+        try:
+            chat_response = await chat_completion_request(
+                messages=messages, model="gpt-4-turbo-preview"
+            )
+
+            response_content = chat_response.choices[0].message.content
+            answer = json.loads(response_content)
+
+        except json.JSONDecodeError:
+            LOG.error(f"Unable to decode chat response: {response_content}")
+        except Exception as e:
+            LOG.error(f"Exception: {e}")
+
+        return answer
+
+    async def construct_step_history(self, task_id) -> list[str]:
+        """Construct list with string representations of past steps"""
+
+        try:
+            past_steps, _ = await self.db.list_steps(task_id)
+        except NotFoundError:
+            past_steps = []
+
+        # Generate list of previous steps in the format:
+        # Step <i>:
+        #   Input: <input>
+        #   Proposed Ability: <ability>
+        #   Output: <output>
+        previous_actions = []
+        for i, step in enumerate(past_steps, 1):
+            if step.additional_output:
+                proposed_ability = step.additional_output["ability"]["proposed"]
+                ability_output = step.additional_output["ability"]["output"]
+                previous_actions.append(
+                    f"Step {i}:\n\t Input: {step.input}\n\t Proposed Ability:{proposed_ability}\n\t Output: {ability_output}"
+                )
+
+        return previous_actions

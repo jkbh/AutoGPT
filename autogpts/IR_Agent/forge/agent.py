@@ -18,6 +18,15 @@ from forge.sdk.errors import NotFoundError
 
 LOG = ForgeLogger(__name__)
 
+BEST_PRACTICES = [
+    "Do not use the same ability two times in a row."
+    "Prefer querying your memory to retrieve source before answering.",
+    "When a proposed ability outputs an error, address that error in your next proposed ability.",
+    "Speak about what you are doing in the current step.",
+]
+RESOURCES = [
+    "A vector database representing your memory. You can ingest documents into it and query it for relevant information."
+]
 
 class ForgeAgent(Agent):
     """
@@ -182,6 +191,8 @@ class ForgeAgent(Agent):
             "task-step",
             task=task.input,
             abilities=self.abilities.list_abilities_for_prompt(),
+            best_practices=BEST_PRACTICES,
+            resources=RESOURCES,
             previous_actions=previous_actions,
         )
 

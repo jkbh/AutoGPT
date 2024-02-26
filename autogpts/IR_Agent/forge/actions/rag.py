@@ -3,32 +3,34 @@ from .registry import action
 from ..sdk.prompting import PromptEngine
 
 
-@action(
-    name="generate_with_context",
-    description="Answer a prompt using content from a textfile as context",
-    parameters=[
-        {
-            "name": "prompt",
-            "description": "The prompt to generate an answer for",
-            "type": "str",
-            "required": True,
-        },
-        {
-            "name": "context_file",
-            "description": "The file that contains the context",
-            "type": "str",
-            "required": True,
-        },
-        {
-            "name": "out_file",
-            "description": "The file will that contains the answer",
-            "type": "str",
-            "required": True,
-        },
-    ],
-    output_type="None",
-)
-async def generate_with_context(agent, task_id: str, prompt: str, context_file: str, out_file: str):
+# @action(
+#     name="generate_with_context",
+#     description="Answer a prompt using content from a textfile as context",
+#     parameters=[
+#         {
+#             "name": "prompt",
+#             "description": "The prompt to generate an answer for",
+#             "type": "str",
+#             "required": True,
+#         },
+#         {
+#             "name": "context_file",
+#             "description": "The file that contains the context",
+#             "type": "str",
+#             "required": True,
+#         },
+#         {
+#             "name": "out_file",
+#             "description": "The file will that contains the answer",
+#             "type": "str",
+#             "required": True,
+#         },
+#     ],
+#     output_type="None",
+# )
+async def generate_with_context(
+    agent, task_id: str, prompt: str, context_file: str, out_file: str
+):
     """Generate answer to prompt based on given context"""
     model = "gpt-3.5-turbo"
     context = agent.workspace.read_text(task_id, context_file)
@@ -54,6 +56,5 @@ async def generate_with_context(agent, task_id: str, prompt: str, context_file: 
         task_id=task_id,
         file_name=out_file.split("/")[-1],
         relative_path=out_file,
-        agent_created=True
+        agent_created=True,
     )
-

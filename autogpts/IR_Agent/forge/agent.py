@@ -138,7 +138,7 @@ class ForgeAgent(Agent):
 
         task = await self.db.get_task(task_id)
 
-        step_prompt_input = step_request.input if step_request.input else task.input
+        step_prompt_input = step_request.input if step_request.input else "Continue"
 
         previous_actions = await self.construct_step_history(task_id)
 
@@ -179,7 +179,7 @@ class ForgeAgent(Agent):
             "ability": {
                 "proposed": ability,
                 "output": output,
-            }
+            },
         }
 
         await self.db.create_action(task_id, ability["name"], ability["args"])

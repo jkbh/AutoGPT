@@ -39,45 +39,45 @@ import os
 #     db.add(documents[:100], metadatas[:100])
 
 
-@action(
-    name="query_memory",
-    description="Retrieve the most relevant information from your memory for a query and save it to a .txt file",
-    parameters=[
-        {
-            "name": "query",
-            "description": "The query used for retrieval",
-            "type": "string",
-            "required": True,
-        },
-        {
-            "name": "output_file",
-            "description": "Textfile to save the output to",
-            "type": "string",
-            "required": True,
-        },
-    ],
-    output_type="string",
-)
-async def query_memory(
-    agent,
-    task_id: str,
-    query: str,
-    output_file: str,
-) -> str:
-    """
-    Query the vector database
-    """
-    db = ChromaVectorStore("./chroma")
-    result = db.query([query])
-    # format result to save to txt file
-    data = f"Query results for '{query}':\n\n"
-    data += "\n\n".join(
-        [f"Document {i}:\n\n{doc}" for i, doc in enumerate(result["documents"][0], 1)]
-    )
-    agent.workspace.write(task_id=task_id, path=output_file, data=data.encode())
-    return await agent.db.create_artifact(
-        task_id=task_id,
-        file_name=output_file.split("/")[-1],
-        relative_path=output_file,
-        agent_created=True,
-    )
+# @action(
+#     name="query_memory",
+#     description="Retrieve the most relevant information from your memory for a query and save it to a .txt file",
+#     parameters=[
+#         {
+#             "name": "query",
+#             "description": "The query used for retrieval",
+#             "type": "string",
+#             "required": True,
+#         },
+#         {
+#             "name": "output_file",
+#             "description": "Textfile to save the output to",
+#             "type": "string",
+#             "required": True,
+#         },
+#     ],
+#     output_type="string",
+# )
+# async def query_memory(
+#     agent,
+#     task_id: str,
+#     query: str,
+#     output_file: str,
+# ) -> str:
+#     """
+#     Query the vector database
+#     """
+#     db = ChromaVectorStore("./chroma")
+#     result = db.query([query])
+#     # format result to save to txt file
+#     data = f"Query results for '{query}':\n\n"
+#     data += "\n\n".join(
+#         [f"Document {i}:\n\n{doc}" for i, doc in enumerate(result["documents"][0], 1)]
+#     )
+#     agent.workspace.write(task_id=task_id, path=output_file, data=data.encode())
+#     return await agent.db.create_artifact(
+#         task_id=task_id,
+#         file_name=output_file.split("/")[-1],
+#         relative_path=output_file,
+#         agent_created=True,
+#     )

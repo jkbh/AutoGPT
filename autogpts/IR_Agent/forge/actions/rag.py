@@ -28,33 +28,33 @@ from ..sdk.prompting import PromptEngine
 #     ],
 #     output_type="None",
 # )
-async def generate_with_context(
-    agent, task_id: str, prompt: str, context_file: str, out_file: str
-):
-    """Generate answer to prompt based on given context"""
-    model = "gpt-3.5-turbo"
-    context = agent.workspace.read_text(task_id, context_file)
+# async def generate_with_context(
+#     agent, task_id: str, prompt: str, context_file: str, out_file: str
+# ):
+#     """Generate answer to prompt based on given context"""
+#     model = "gpt-3.5-turbo"
+#     context = agent.workspace.read_text(task_id, context_file)
 
-    engine = PromptEngine(model)
-    rag_prompt = engine.load_prompt(
-        "augmented-generation", task=prompt, context=context
-    )
+#     engine = PromptEngine(model)
+#     rag_prompt = engine.load_prompt(
+#         "augmented-generation", task=prompt, context=context
+#     )
 
-    messages = [
-        {
-            "role": "system",
-            "content": "Your answer to prompts only relies on the provided context.",
-        },
-        {"role": "user", "content": rag_prompt},
-    ]
+#     messages = [
+#         {
+#             "role": "system",
+#             "content": "Your answer to prompts only relies on the provided context.",
+#         },
+#         {"role": "user", "content": rag_prompt},
+#     ]
 
-    response = await chat_completion_request(model=model, messages=messages)
-    answer = response.choices[0].message.content
+#     response = await chat_completion_request(model=model, messages=messages)
+#     answer = response.choices[0].message.content
 
-    agent.workspace.write(task_id=task_id, path=out_file, data=answer.encode())
-    return await agent.db.create_artifact(
-        task_id=task_id,
-        file_name=out_file.split("/")[-1],
-        relative_path=out_file,
-        agent_created=True,
-    )
+#     agent.workspace.write(task_id=task_id, path=out_file, data=answer.encode())
+#     return await agent.db.create_artifact(
+#         task_id=task_id,
+#         file_name=out_file.split("/")[-1],
+#         relative_path=out_file,
+#         agent_created=True,
+#     )

@@ -28,7 +28,6 @@ RESOURCES = [
     "A vector database representing your memory. You can ingest documents into it and query it for relevant information."
 ]
 
-
 class ForgeAgent(Agent):
     """
     The goal of the Forge is to take care of the boilerplate code, so you can focus on

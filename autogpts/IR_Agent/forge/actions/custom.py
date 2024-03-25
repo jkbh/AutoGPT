@@ -89,7 +89,7 @@ async def answer_with_context(
     response = await chat_completion_request(model=model, messages=messages)
     answer = response.choices[0].message.content
 
-    agent.workspace.write(task_id=task_id, path=output_file, data=answer.encode())
+    agent.workspace.write(task_id=task_id, path="output.txt", data=answer.encode())
 
 
 async def generate_backlinks(agent, task_id: str, input_file: str, output_file: str):

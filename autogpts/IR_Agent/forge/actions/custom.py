@@ -30,7 +30,7 @@ async def create_artifact(agent, task_id, file):
             "required": True,
         },
     ],
-    output_type="string",
+    output_type="file",
 )
 async def retrieve_context_from_memory(agent, task_id, query: str, output_file: str):
     db = ChromaVectorStore("./chroma")
@@ -40,6 +40,8 @@ async def retrieve_context_from_memory(agent, task_id, query: str, output_file: 
         [f"Document {i}:\n\n{doc}" for i, doc in enumerate(result["documents"][0], 1)]
     )
     agent.workspace.write(task_id=task_id, path=output_file, data=data.encode())
+
+    return f"file: {output_file}"
 
 
 @action(
@@ -65,7 +67,7 @@ async def retrieve_context_from_memory(agent, task_id, query: str, output_file: 
             "required": True,
         },
     ],
-    output_type="None",
+    output_type="file",
 )
 async def answer_with_context(
     agent, task_id, prompt: str, context_file: str, output_file: str
@@ -90,6 +92,8 @@ async def answer_with_context(
     answer = response.choices[0].message.content
 
     agent.workspace.write(task_id=task_id, path="output.txt", data=answer.encode())
+
+    return "file: output.txt"
 
 
 async def generate_backlinks(agent, task_id: str, input_file: str, output_file: str):

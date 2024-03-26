@@ -6,7 +6,6 @@ import pandas as pd
 from datetime import datetime
 import argparse
 import logging
-import cachetools
 
 
 handler = logging.StreamHandler()
@@ -21,6 +20,7 @@ parser.add_argument(
     choices=["gpt3", "gpt4", "agent", "perplexity"],
     help="The source to be evaluated",
 )
+parser.add_argument("--test", help="Only use a single question to test the script")
 args = parser.parse_args()
 
 match args.source:
@@ -31,7 +31,7 @@ match args.source:
     case s:
         MODEL = s
 
-TEST = True
+TEST = True if args.test else False
 
 load_dotenv()
 # library_dir = path.dirname(path.realpath(__file__))
@@ -70,7 +70,7 @@ def get_answer(question, index):
                 file.write(answer)
         return answer
 
-    model_answers_path = path.join(eval_dir, f"{MODEL}_answers.txt")
+    model_answers_path = path.join(eval_dir, "answers", f"{MODEL}_answers.txt")
     with open(model_answers_path) as file:
         for i, line in enumerate(file):
             if i == index:

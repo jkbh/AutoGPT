@@ -40,7 +40,7 @@ async def retrieve_context_from_memory(agent, task_id, query: str, output_file: 
         [f"Document {i}:\n\n{doc}" for i, doc in enumerate(result["documents"][0], 1)]
     )
     agent.workspace.write(task_id=task_id, path=output_file, data=data.encode())
-
+    await create_artifact(agent, task_id, output_file)
     return f"file: {output_file}"
 
 
@@ -92,7 +92,7 @@ async def answer_with_context(
     answer = response.choices[0].message.content
 
     agent.workspace.write(task_id=task_id, path="output.txt", data=answer.encode())
-
+    await create_artifact(agent, task_id, "output.txt")
     return "file: output.txt"
 
 

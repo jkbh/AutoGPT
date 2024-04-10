@@ -1,6 +1,6 @@
-from os import path
+from os import path, listdir
 from openai import OpenAI
-from scipy.spatial.distance import cosine
+from sklearn.metrics.pairwise import cosine_similarity
 from dotenv import load_dotenv
 import pandas as pd
 from datetime import datetime
@@ -14,63 +14,113 @@ logger = logging.getLogger(__file__)
 logger.addHandler(handler)
 logger.setLevel(level=logging.INFO)
 
-parser = argparse.ArgumentParser(description="Evaluate Q&A quality of different tools")
-parser.add_argument(
-    "source",
-    choices=["gpt3", "gpt4", "agent", "perplexity"],
-    help="The source to be evaluated",
-)
-parser.add_argument("--test", help="Only use a single question to test the script")
-args = parser.parse_args()
 
-match args.source:
-    case "gpt3":
-        MODEL = "gpt-3.5-turbo"
-    case "gpt4":
-        MODEL = "gpt-4-turbo-preview"
-    case s:
-        MODEL = s
+def main():
+    arg_model_map = {
+        "gpt3": "gpt-3.5-turbo",
+        "gpt4": "gpt-4-turbo-preview",
+        "agent": "agent",
+        "perplexity": "perplexity",
+    }
 
-TEST = True if args.test else False
+    parser = argparse.ArgumentParser(
+        description="Evaluate Q&A quality of different tools"
+    )
+    parser.add_argument(
+        "--sources",
+        action="append",
+        choices=["gpt3", "gpt4", "agent", "perplexity"],
+        help="The sources to be evaluated, if none evaluates all sources",
+    )
+    parser.add_argument("--test", help="Only use a single question to test the script")
+    parser.add_argument("--regen", action="store_true")
+    args = parser.parse_args()
 
-load_dotenv()
-# library_dir = path.dirname(path.realpath(__file__))
-eval_dir = path.dirname(path.realpath(__file__))
-testdata_path = path.join(eval_dir, "test_data.txt")
+    use_cache = False if args.regen else True
 
-questions = []
-answers = []
-with open(testdata_path) as file:
-    for line in file:
-        questions.append(line.strip())
-        answers.append(next(file).strip())
-        _ = next(file)  # skip empty line
-        if TEST:
-            break
+    match args.sources:
+        case None:
+            models = arg_model_map.values()
+        case source_list:
+            models = [arg_model_map[source] for source in source_list]
+
+    is_test_run = True if args.test else False
+
+    load_dotenv()
+    eval_dir = path.dirname(path.realpath(__file__))
+    testdata_path = path.join(eval_dir, "test_data.txt")
+
+    questions = []
+    answers = []
+    with open(testdata_path) as file:
+        for line in file:
+            questions.append(line.strip())
+            answers.append(next(file).strip())
+            _ = next(file)  # skip empty line
+            if is_test_run:
+                break
+
+    answer_embeddings = get_embeddings(answers)
+
+    for model in models:
+        logger.info(f"Generating results for {model}")
+        logger.info("Generating embeddings with OpenAI API")
+        model_answers = []
+        for i, question in enumerate(questions):
+            logger.info(f"Generating answer for question {i}")
+            logger.debug(f"Q: {question}")
+
+            answer = get_answer(question, i, model, use_cache)
+
+            logger.debug(f"A: {answer}\n")
+
+            model_answers.append(answer)
+
+        model_answer_embeddings = get_embeddings(model_answers)
+
+        results = pd.DataFrame(
+            {
+                "question": questions,
+                "answer": answers,
+                "model_answer": model_answers,
+                "cosine_sims": get_similarities(
+                    answer_embeddings, model_answer_embeddings
+                ),
+            }
+        )
+
+        timestamp = datetime.strftime(datetime.now(), "%m_%d_%y_%H:%M:%S")
+        output_path = path.join(eval_dir, "results", f"{model}_{timestamp}.csv")
+        results.to_csv(output_path)
+        logger.info(f"Results written to {output_path}")
+
+    gather_results()
 
 
-def get_answer(question, index):
-    if "gpt" in MODEL:
-        answer_path = path.join(eval_dir, "answers", f"{index}_{MODEL}.txt")
-        if path.exists(answer_path):
+def get_answer(question, index, model, use_cache):
+    eval_dir = path.dirname(path.realpath(__file__))
+    if "gpt" in model:
+        cached_answer_path = path.join(eval_dir, "answers", f"{index}_{model}.txt")
+        if use_cache and path.exists(cached_answer_path):
             logger.info(f"Using cached answer for question {index}")
-            with open(answer_path) as file:
+            with open(cached_answer_path) as file:
                 answer = "\n".join(file.readlines())
         else:
             logger.info(f"Calling API for question {index}")
             client = OpenAI()
             response = client.chat.completions.create(
-                model=MODEL,
+                model=model,
                 messages=[
                     {"role": "user", "content": f"{question}"},
                 ],
             )
-            with open(answer_path, "+x") as file:
+            with open(cached_answer_path, "+x") as file:
                 answer = response.choices[0].message.content
                 file.write(answer)
         return answer
 
-    model_answers_path = path.join(eval_dir, "answers", f"{MODEL}_answers.txt")
+    # Non GPT
+    model_answers_path = path.join(eval_dir, "answers", f"{model}_answers.txt")
     with open(model_answers_path) as file:
         for i, line in enumerate(file):
             if i == index:
@@ -85,38 +135,35 @@ def get_embeddings(documents):
     return [item.embedding for item in response.data]
 
 
-def get_distances(answers, model_answers):
-    "Calculates cosine distances from embeddings"
-    distances = []
+def get_similarities(answers, model_answers):
+    "Calculates cosine similarities from embeddings"
+    similarities = []
     for gold, model in zip(answers, model_answers):
-        distance = cosine(gold, model)
-        distances.append(distance)
-    return distances
+        cosine_sim = cosine_similarity([gold], [model])
+        similarities.append(cosine_sim[0, 0])
+    return similarities
 
 
-model_answers = []
-for i, question in enumerate(questions):
-    logger.info(f"Generating answer for question {i}")
-    logger.debug(f"Q: {question}")
-    answer = get_answer(question, i)
-    logger.debug(f"A: {answer}\n")
-    model_answers.append(answer)
+def gather_results():
+    eval_dir = path.dirname(path.realpath(__file__))
+    results_dir = path.join(eval_dir, "results")
+
+    cosine_sims = None
+
+    for filename in listdir(results_dir):
+        if "gathered" in filename:
+            continue
+        df = pd.read_csv(path.join(results_dir, filename))
+        if df["cosine_sims"].size < 9:
+            continue
+        if cosine_sims is None:
+            cosine_sims = {filename: df["cosine_sims"].to_list()}
+        else:
+            cosine_sims[filename] = df["cosine_sims"].to_list()
+
+    dataframe = pd.DataFrame(cosine_sims)
+    dataframe.to_csv(path.join(results_dir, "gathered.csv"))
 
 
-logger.info("Generating embeddings with OpenAI API")
-answer_embeddings = get_embeddings(answers)
-model_answer_embeddings = get_embeddings(model_answers)
-
-results = pd.DataFrame(
-    {
-        "questions": questions,
-        "answers": answers,
-        "model_answers": model_answers,
-        "distances": get_distances(answer_embeddings, model_answer_embeddings),
-    }
-)
-
-timestamp = datetime.strftime(datetime.now(), "%m_%d_%y_%H:%M:%S")
-output_path = path.join(eval_dir, "results", f"{MODEL}_{timestamp}.csv")
-results.to_csv(output_path)
-logger.info(f"Results written to {output_path}")
+if __name__ == "__main__":
+    main()

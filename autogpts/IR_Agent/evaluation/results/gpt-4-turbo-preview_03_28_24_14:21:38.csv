@@ -1,4 +1,4 @@
-,questions,answers,model_answers,distances
+,question,answer,model_answer,cosine_sims
 0,What was the underlying assumption of celestial phenomena in Assyrian celestial divination?,Underlying this practice was the assumption that celestial phenomena are a form of ‘heavenly writing’ in which the gods reveal their decisions about future events.,"The underlying assumption of celestial phenomena in Assyrian celestial divination was that occurrences in the heavens (such as lunar and solar eclipses, planetary movements, and other astronomical events) were direct manifestations of the gods' will and intentions. The Assyrians believed that these celestial events were signs that could indicate future outcomes on Earth, affecting everything from the fate of the king and the empire to weather conditions and military success.
 
 
@@ -7,89 +7,165 @@ Celestial divination in Assyria, part of a broader Mesopotamian tradition, held 
 
 
 
-This belief in the significance of celestial phenomena was deeply integrated into Assyrian religion, governance, and daily life, leading to the development of a sophisticated system of astronomy and astrological interpretation. The meticulous observations and records kept by Mesopotamian scholars over centuries laid important foundations for the later development of astronomy.",0.3216708477103406
+This belief in the significance of celestial phenomena was deeply integrated into Assyrian religion, governance, and daily life, leading to the development of a sophisticated system of astronomy and astrological interpretation. The meticulous observations and records kept by Mesopotamian scholars over centuries laid important foundations for the later development of astronomy.",0.6783568318848479
 1,What is a 'qersu'?,Some consultations took place in a sacred enclosure by the river called a qersu.,"As of my last update in April 2023, the term ""qersu"" refers to a concept from the ancient world, specifically within the context of Hittite culture. The Hittites were an ancient Anatolian people who established an empire centered on Hattusa in north-central Turkey from the 18th century to the 12th century BCE.
+
+
 
 In Hittite culture, a ""qersu"" was essentially a type of temple or sanctuary. It is mentioned in various Hittite texts and inscriptions. The word might have broader implications, potentially referring to a specific part of a temple complex or a type of sacred area, but its primary association is with religious or sacred structures.
 
-The understanding of such ancient concepts is subject to ongoing research and interpretation. The Hittite language and its terms, including ""qersu,"" are known through the study of cuneiform tablets that have been discovered and translated by archaeologists and linguists. As more discoveries are made, our understanding of these terms and their specific functions or meanings within Hittite culture may evolve.",0.45815804601207255
-2,What were Babylonian astronomers called?,"Around 1,000 fragments of astronomical diaries and related texts dating between c. 650 BCE and 75 CE were excavated near Babylon’s main temple Esagila, sanctuary of the supreme god Marduk (Bel). The astronomers who wrote these texts were called ‘scribes of Enūma Anu Enlil’ as in earlier times.","Babylonian astronomers were often referred to as ""Chaldeans."" In ancient times, the term Chaldeans came to be closely associated with people who were skilled in the sciences, particularly astronomy and astrology. Although initially, the Chaldeans were a people who lived in the southern part of Babylonia, over time, the name became synonymous with Babylonian priests and astronomers because of their advanced knowledge and contributions to early astronomy. They were renowned for their meticulous observations of celestial phenomena and their efforts to catalog and predict astronomical events, such as eclipses and the movements of the planets.",0.463277323075467
+
+
+The understanding of such ancient concepts is subject to ongoing research and interpretation. The Hittite language and its terms, including ""qersu,"" are known through the study of cuneiform tablets that have been discovered and translated by archaeologists and linguists. As more discoveries are made, our understanding of these terms and their specific functions or meanings within Hittite culture may evolve.",0.5413693401103974
+2,What were Babylonian astronomers called?,"Around 1,000 fragments of astronomical diaries and related texts dating between c. 650 BCE and 75 CE were excavated near Babylon’s main temple Esagila, sanctuary of the supreme god Marduk (Bel). The astronomers who wrote these texts were called ‘scribes of Enūma Anu Enlil’ as in earlier times.","Babylonian astronomers were often referred to as ""Chaldeans."" In ancient times, the term Chaldeans came to be closely associated with people who were skilled in the sciences, particularly astronomy and astrology. Although initially, the Chaldeans were a people who lived in the southern part of Babylonia, over time, the name became synonymous with Babylonian priests and astronomers because of their advanced knowledge and contributions to early astronomy. They were renowned for their meticulous observations of celestial phenomena and their efforts to catalog and predict astronomical events, such as eclipses and the movements of the planets.",0.5367226769245329
 3,What are 'almanacs' and 'Normal Star almanacs' in the context of Babylonian astronomy?,"predictive almanacs and Normal Star almanacs were generated from the Goal-Year texts. For the present purpose, suffice it to say that each almanac or Normal Star almanac contained data from one Goal-Year text re-arranged chronologically from months I to XII or XII2 of the Goal Year.","Babylonian astronomy, one of the earliest systematic and scientific approaches to astronomy, flourished in Mesopotamia, modern-day Iraq, from the early 2nd millennium BCE through the Hellenistic period. Babylonians developed a sophisticated method of observing and recording celestial events. They utilized various astronomical texts, among which 'almanacs' and 'Normal Star almanacs' are notable for their roles in their astronomical practices.
+
+
 
 ### Almanacs
 
+
+
 In the context of Babylonian astronomy, almanacs were annual publications that contained information about the moon, planets, and stars for each month or day of the year. These almanacs provided detailed predictions of celestial phenomena, including the rising and setting of planets, lunar phases, and eclipses. The data compiled in these almanacs were based on systematic observations and advanced mathematical calculations, reflecting the Babylonians' deep understanding of celestial mechanics.
+
+
 
 The content of Babylonian almanacs was geared toward both practical and ceremonial purposes. Agriculturally, they were instrumental in determining the optimal times for planting and harvesting by tracking the movements of celestial bodies. Religiously and culturally, the timings of certain celestial events were significant for festivals and rituals.
 
+
+
 ### Normal Star Almanacs
+
+
 
 'Normal Star almanacs' refer specifically to a subset of Babylonian astronomical texts that recorded the annual appearances and disappearances (heliacal risings and settings) of certain stars and constellations. These stars, often referred to as 'Normal Stars,' were used as reference points to help track the progress of the year and to predict the timing of agricultural and religious activities.
 
+
+
 The choice of these Normal Stars was not arbitrary; they were carefully selected for their regular and predictable behavior. The Babylonians' ability to predict the heliacal risings (the first appearance of a star in the dawn sky just before sunrise) and settings (the last time a star is visible in the evening sky just after sunset before it becomes too close to the sun to see) of these stars with great accuracy was a testament to their advanced observational skills and mathematical prowess.
+
+
 
 Normal Star almanacs, thus, served a vital function in maintaining the Babylonian calendar, augmenting agricultural planning, and ensuring the timely observation of religious ceremonies. They stand as a testament to the Babylonian contribution to the early development of astronomy as a predictive science.
 
-In summary, 'almanacs' and 'Normal Star almanacs' were essential components of Babylonian astronomy, reflecting the civilization's sophisticated understanding of celestial phenomena and its practical applications to agriculture, religion, and timekeeping.",0.3581563141896993
+
+
+In summary, 'almanacs' and 'Normal Star almanacs' were essential components of Babylonian astronomy, reflecting the civilization's sophisticated understanding of celestial phenomena and its practical applications to agriculture, religion, and timekeeping.",0.6384068753834347
 4,What distinguishes Assyrian celestial divination from Babylonian astral science?,"A comparison between the Assyrian and Babylonian sources discussed above reveals some notable differences. For one thing, prediction played an insignificant role in Assyrian celestial divination compared to Babylonian astral science.","Assyrian celestial divination and Babylonian astral science represent two distinct, though related, traditions within the broader context of Mesopotamian intellectual and religious culture. The differences between these traditions can be understood in terms of their historical development, geographical origins, and the specific practices and emphases that characterized each.
+
+
 
 ### Historical Context
 
+
+
 **Babylonian astral science** developed over several millennia, with its roots traceable to early Babylonian and Sumerian civilizations (circa 2000 BCE onward). It evolved into a sophisticated system of celestial observation, interpretation, and prediction, heavily influencing later Greek and Hellenistic astrology. Babylonian scholars, such as those from the famous library of Ashurbanipal in Nineveh, recorded astronomical observations and omens. They developed complex mathematical models to predict lunar and planetary movements, eclipses, and the positions of celestial bodies.
+
+
 
 **Assyrian celestial divination**, on the other hand, largely flourished during the first millennium BCE, particularly in the Neo-Assyrian Empire. While it certainly drew on earlier Babylonian traditions, Assyrian practices were more directly concerned with the interpretation of omens, including those observed in the heavens, for purposes related to the king's decisions and the welfare of the state.
 
+
+
 ### Geographical and Cultural Differences
 
+
+
 - **Assyria** was situated predominantly in the northern part of Mesopotamia, with major centers like Nimrud, Ashur, and Nineveh. Assyrian celestial divination, therefore, developed within the context of an imperial society with a strong emphasis on military conquest and centralized political power. Celestial omens were often interpreted in light of their implications for the king and empire, focusing on matters of warfare, expansion, and state stability.
+
   
+
 - **Babylonia**, located to the south, including cities like Babylon and Ur, cultivated astral sciences as part of a broader scholarly tradition that included mathematics, medicine, and literary works. Babylonian astronomy and astrology were highly advanced, with a notable focus on the systematic observation and mathematical prediction of celestial phenomena.
+
+
 
 ### Practical and Theoretical Differences
 
+
+
 - **Babylonian Astronomy and Astrology** incorporated detailed mathematical and observational techniques to develop ephemerides (tables predicting celestial events) and elaborate schemes for interpreting celestial influences on both earthly events and individual fortunes. It had a more universal scope, considering the movements of celestial bodies as part of an ordered cosmos that affected all aspects of the natural world and human life.
+
+
 
 - **Assyrian Celestial Divination**, while benefiting from and contributing to the Babylonian knowledge base, was more immediately focused on the interpretation of signs and omens for royal and state purposes. This included not just astronomical phenomena but also other divinatory practices such as examining the entrails of animals, interpreting the flight of birds, and analyzing dreams.
 
+
+
 ### Conclusions
 
-While there is substantial overlap and interchange between Assyrian and Babylonian practices—indeed, the Assyrians adopted, adapted, and contributed to Babylonian astral knowledge—the key distinctions revolve around context, application, and focus. Assyrian celestial divination tends to be more concerned with statecraft and the monarchy, manifested in omens and portents relevant to the empire's fortunes. Babylonian astral science, with its deeper historical roots, embodies a more comprehensive effort to understand and predict celestial phenomena through mathematical and empirical methods, reflecting a broader cosmological and philosophical inquiry into the nature of the universe and human destiny.",0.22510471845923308
+
+
+While there is substantial overlap and interchange between Assyrian and Babylonian practices—indeed, the Assyrians adopted, adapted, and contributed to Babylonian astral knowledge—the key distinctions revolve around context, application, and focus. Assyrian celestial divination tends to be more concerned with statecraft and the monarchy, manifested in omens and portents relevant to the empire's fortunes. Babylonian astral science, with its deeper historical roots, embodies a more comprehensive effort to understand and predict celestial phenomena through mathematical and empirical methods, reflecting a broader cosmological and philosophical inquiry into the nature of the universe and human destiny.",0.7713367079586136
 5,"What suggests that Babylonian astronomers offered their services to foreign kings, including Alexander the Great?","In spite of a lack of textual evidence, it is generally assumed that celestial divination was practised at the Babylonian court after the fall of Niniveh (in 611 BCE), which suggests that at least some of those who compiled astronomical diaries were engaged in these activities. Even after the Persian conquest of Babylonia in 539 BCE, when native Mesopotamian kingship disappeared, Babylonian astronomers are said to have offered their services to their foreign kings, including Alexander the Great.44","The evidence suggesting that Babylonian astronomers offered their services to foreign kings, including Alexander the Great, comes from a variety of ancient texts and historical analyses. Babylon, a key cultural and scientific hub in ancient Mesopotamia, was renowned for its advancements in astronomy. The Babylonians developed sophisticated mathematical techniques for predicting lunar, solar, and planetary phenomena, and they meticulously recorded astronomical observations on clay tablets.
+
+
 
 Several lines of evidence suggest interactions between Babylonian astronomers and foreign rulers:
 
+
+
 1. **Historical Records:** Ancient texts, including those from Greek and Roman sources, occasionally reference the interactions between Babylonian scholars and foreign courts. While direct mentions of astronomers serving specific foreign kings like Alexander the Great are rare, the broader historical context supports such interactions. After Alexander the Great conquered Babylon in 331 BCE, he showed a keen interest in the city's scholarly traditions. Historical accounts indicate that Alexander consulted Babylonian priests and possibly astronomers, who were highly regarded for their expertise.
+
+
 
 2. **Astronomical Diaries:** The Babylonians kept detailed astronomical diaries, which included observations of the planets, the Moon, and the weather, as well as economic, agricultural, and political events. Some of these observations might have been of interest to foreign rulers seeking to make decisions based on celestial omens or looking to employ advanced astronomical knowledge for calendrical or navigational purposes. While the diaries themselves might not explicitly mention services rendered to foreign kings, they exemplify the type of knowledge that would have been valuable to such rulers.
 
+
+
 3. **Cultural Exchange:** The period following Alexander's conquests saw significant cultural exchanges between the Greek and the Near Eastern worlds. Greek interest in Babylonian science, particularly in astronomy and astrology, increased. This cultural exchange suggests a framework in which Babylonian astronomers could have offered their services to foreign rulers, including Greeks, who were keen on incorporating Babylonian scientific knowledge into their own scholarly traditions.
+
+
 
 4. **Scientific Influence:** The influence of Babylonian astronomy on subsequent Greek and Hellenistic astronomy suggests a transfer of knowledge that could have involved direct interactions between Babylonian astronomers and foreign scholars or rulers. For instance, the Babylonian sexagesimal (base-60) system was adopted by the Greeks for astronomical calculations, and later Hellenistic works exhibit clear Babylonian influences in their astronomical and astrological methods.
 
-Although direct evidence of Babylonian astronomers serving specific foreign kings like Alexander the Great is scarce, the circumstantial evidence points towards a scenario where Babylonian astronomical expertise would have been highly esteemed and sought after by foreign rulers. This expertise, coupled with the cultural and scientific exchanges of the era, strongly suggests that Babylonian astronomers could have offered their services far beyond their homeland.",0.23435223669716143
+
+
+Although direct evidence of Babylonian astronomers serving specific foreign kings like Alexander the Great is scarce, the circumstantial evidence points towards a scenario where Babylonian astronomical expertise would have been highly esteemed and sought after by foreign rulers. This expertise, coupled with the cultural and scientific exchanges of the era, strongly suggests that Babylonian astronomers could have offered their services far beyond their homeland.",0.7620394081802122
 6,What is the divine office?,"The term ‘divine office’ is the translation of the Latin divinum officium, which means divine duty or service. It designates the cycle of prayers, chants and lessons that are to be performed as a service to God by monks and the clergy every day, both at day and at night.","The Divine Office, also known as the Liturgy of the Hours, is the official set of prayers ""marking the hours of each day and sanctifying the day with prayer"" in the Roman Catholic Church. It is also observed in varying forms within some other Christian denominations, including the Eastern Orthodox Church, Anglicanism, and Lutheranism.
+
+
 
 The purpose of the Divine Office is to ensure the continuous prayer of the Church and to offer praise to God, commemorating the mysteries of Christ and sanctifying the day. The prayers consist primarily of Psalms supplemented by hymns, readings, and prayers. The Divine Office includes several components or ""hours"" traditionally prayed at specific times of the day:
 
+
+
 1. **Office of Readings (formerly Matins)**: This can be prayed at any time and includes readings from the Bible and writings of the saints.
+
 2. **Lauds (Morning Prayer)**: Prayed at dawn or in the early morning, focusing on praise at the start of the day.
+
 3. **Terce (Mid-Morning Prayer), Sext (Midday Prayer), and None (Mid-Afternoon Prayer)**: These shorter hours are prayed at the third, sixth, and ninth hours of the day, respectively, and include prayers and readings appropriate to the time of day.
+
 4. **Vespers (Evening Prayer)**: Prayed at sunset or in the early evening, offering thanks for the day.
+
 5. **Compline (Night Prayer)**: The final prayers of the day, prayed before retiring for the night, focusing on reflection and protection during sleep.
 
+
+
 Clergy and many religious are required to pray the Divine Office as part of their daily obligations. Many laypeople also pray the Liturgy of the Hours, either in part or in full, as a way of participating in the universal prayer of the Church and deepening their spiritual lives. The content for the Divine Office is organized in liturgical books called breviaries.
-",0.24545795744554366
-7,Who was likely the user of the portable breviary from San Zeno Maggiore?,The fact that the breviary transmits texts decidedly pertinent to the abbot reveals quite clearly that the book was intended for no less than the abbot of San Zeno Maggiore.,"The portable breviary from San Zeno Maggiore, an important medieval manuscript, was very likely used by a high-ranking church official or member of the monastic community associated with the Basilica of San Zeno Maggiore in Verona, Italy. Given the quality and intricacy of its production, including its illumination, it suggests the user was someone of considerable importance and means, such as an abbot, bishop, or a wealthy patron closely connected to the church. The breviary, being a book containing the Divine Office for the canonical hours (the prayers to be said at the different hours of the day by members of the Catholic Church), was an indispensable tool for the personal devotion and liturgical duties of clerics, making its association with a figure of authority within the church all the more plausible. Without specific provenance details or ownership marks that directly identify the original owner, the exact identity of the user remains a matter of scholarly inference based on the context of its creation and use.",0.31757651482436167
+",0.7537073229997758
+7,Who was likely the user of the portable breviary from San Zeno Maggiore?,The fact that the breviary transmits texts decidedly pertinent to the abbot reveals quite clearly that the book was intended for no less than the abbot of San Zeno Maggiore.,"The portable breviary from San Zeno Maggiore, an important medieval manuscript, was very likely used by a high-ranking church official or member of the monastic community associated with the Basilica of San Zeno Maggiore in Verona, Italy. Given the quality and intricacy of its production, including its illumination, it suggests the user was someone of considerable importance and means, such as an abbot, bishop, or a wealthy patron closely connected to the church. The breviary, being a book containing the Divine Office for the canonical hours (the prayers to be said at the different hours of the day by members of the Catholic Church), was an indispensable tool for the personal devotion and liturgical duties of clerics, making its association with a figure of authority within the church all the more plausible. Without specific provenance details or ownership marks that directly identify the original owner, the exact identity of the user remains a matter of scholarly inference based on the context of its creation and use.",0.6824342229333853
 8,How is the performative distinction between chants and readings maintained in the breviary?,"The performative distinction between chants and readings typical of the earlier Rollenbücher is maintained graphically in these later books for private use, and with it the liturgical-communal performance of the Divine Office is emulated.","In the context of the liturgical breviary used primarily within Christian traditions, especially in Catholicism, chants and readings are two distinct elements contributing uniquely to the structure and execution of liturgical hours or divine office. The breviary is the book that contains all the texts necessary for the celebration of these liturgical hours, including psalms, hymns, readings, and prayers. The distinction between chants and readings in the breviary is maintained through several means, including tradition, notational differences, purpose, and the manner of execution. Here’s an overview:
+
+
 
 1. **Tradition and Liturgical Rules**: The historical and theological traditions of the Church play a significant role in distinguishing between what is chanted and what is read. Liturgical rules, which may vary among different Christian traditions (e.g., Roman Catholic, Eastern Orthodox, Anglican), provide guidelines on the parts of the office that are to be sung or chanted and those that are to be read. For example, the Invitatory, Psalms, Canticles, and Responses are typically chanted, while Readings (lessons), Short Readings (from Scripture), and some prayers might be read, though there is flexibility depending on the specific liturgical context and the solemnity of the occasion.
 
+
+
 2. **Notational Differences**: In many liturgical books, including breviaries, different notations can indicate whether a text is meant to be chanted or read. Chants, especially Gregorian chants, have their specific neumes (a form of musical notation) that guide the melody and rhythm of the chant. On the other hand, readings are typically written in plain text without musical notation, indicating that they are to be read aloud, not sung.
+
+
 
 3. **Purpose and Function**: The liturgical function of the text often dictates whether it is chanted or read. Chants are often used for psalms, hymns, and responses, aiming to elevate the worship experience, facilitate meditation, and enhance the communal aspect of the liturgy. Readings, which primarily consist of larger portions of Scripture, homilies, or writings of Church Fathers, serve a didactic purpose, aiming to instruct and inspire the faithful through direct, clear delivery.
 
+
+
 4. **Execution and Participation**: The practical aspect of how chants and readings are executed also maintains their distinction. Chants are typically performed with a specific tone, melody, and rhythm and may involve antiphonal singing between a cantor/choir and the congregation or between two groups. Readings, however, are proclaimed in a speaking voice, focusing on clarity and audibility to ensure that the congregation can understand the scriptural passages or teachings.
+
+
 
 5. **Musical Setting and Environment**: The musical setting and the acoustics of the environment can also influence the performative distinction. Chants are often supported by acoustics that enhance their musical and meditative quality, while readings might be delivered in a manner that prioritizes intelligibility over musicality.
 
-In conclusion, the distinction between chants and readings in the breviary is maintained through a combination of liturgical tradition, notational indications, the intrinsic purpose of the texts, and the manner of their execution, all of which contribute to the rich tapestry of the liturgical experience.",0.3391302646097085
+
+
+In conclusion, the distinction between chants and readings in the breviary is maintained through a combination of liturgical tradition, notational indications, the intrinsic purpose of the texts, and the manner of their execution, all of which contribute to the rich tapestry of the liturgical experience.",0.6552771389378678
